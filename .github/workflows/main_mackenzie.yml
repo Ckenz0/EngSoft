@@ -107,18 +107,18 @@ jobs:
         run: unzip release.zip
 
       
+      
       # Realiza a autenticação na plataforma Azure.
       - name: Login to Azure
-        # Utiliza a ação oficial de login no Azure.
         uses: azure/login@v2
-        # Define as credenciais necessárias para autenticação.
         with:
-          # Identifica a aplicação cadastrada no Azure.
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2625D0D765264B67BA91D0B4647EA8EC }}
-          # Identifica o diretório de autenticação do Azure.
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_355ECC283CC243B3B0F8BB24D1E138D7 }}
+          # Identifica a aplicação registrada no Azure.
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1378352164EA43F7B617EAB39148923A }}
+          # Identifica o diretório de autenticação.
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9EDC1172E13744598632922BC9528186 }}
           # Identifica a assinatura utilizada no Azure.
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_638D89F46DA9483BB845CE8FB6E9CCA0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F9582E9962864421B372B80B9A6A7E72 }}
+
 
       # Publica a aplicação Python no Azure Web App.
       - name: 'Deploy to Azure Web App'
