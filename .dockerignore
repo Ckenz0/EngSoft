@@ -1,0 +1,34 @@
+# Git e GitHub
+.git
+.github
+.gitignore
+
+# Ambiente virtual Python
+venv/
+.venv/
+env/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Arquivos de configuração sensíveis
+.env
+.env.*
+
+# Arquivos temporários
+*.log
+*.tmp
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.idea/
+
+# Documentação
+README.md
