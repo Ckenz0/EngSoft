@@ -32,3 +32,13 @@ Thumbs.db
 
 # Documentação
 README.md
+
+# Instruções e arquivos de trabalho locais
+.superpowers/
+superpowers/
+**/.superpowers/
+**/superpowers/
+AGENTS.md
+agents.md
+**/AGENTS.md
+**/agents.md

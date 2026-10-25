@@ -1,132 +1,36 @@
+name: Construir e publicar imagem Docker
 
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-# Define o nome do workflow exibido no GitHub Actions.
-name: Build and deploy Python app to Azure Web App - Mackenzie
-
-# Define quando o workflow será executado.
 on:
-  # Executa o workflow quando ocorre um push.
   push:
-    # Define em quais branches ele será executado.
     branches:
-      - main # Executa apenas na branch main.
-  # Permite executar o workflow manualmente.
+      - main
   workflow_dispatch:
 
-# Define os jobs que serão executados.
+permissions:
+  contents: read
+
 jobs:
-  # Job responsável pela preparação da aplicação.
-  build:
-    # Utiliza uma máquina virtual com Ubuntu.
+  docker:
     runs-on: ubuntu-latest
-    # Define as permissões do job.
-    permissions:
-      contents: read #This is required for actions/checkout
 
-    # Define as etapas executadas em sequência.
     steps:
-      # Novo step para imprimir uma mensagem antes do build.
-      - name: Mensagem de início do deploy
-        # Exibe a mensagem no console do GitHub Actions.
-        run: echo "Iniciando o deploy do meu projeto!"
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v6
 
-      # Baixa o código do repositório para a máquina virtual.
-      - uses: actions/checkout@v4
+      - name: Preparar o construtor Docker
+        uses: docker/setup-buildx-action@v4
 
-      # Configura a versão do Python usada no projeto.
-      - name: Set up Python version
-        # Utiliza a ação para configurar o Python.
-        uses: actions/setup-python@v5
-        # Define os parâmetros dessa configuração.
+      - name: Entrar no Docker Hub
+        uses: docker/login-action@v4
         with:
-          python-version: '3.14' # Utiliza Python 3.14.
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Cria e ativa um ambiente virtual Python.
-      - name: Create and start virtual environment
-        # Executa os comandos no terminal.
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      # Instala as bibliotecas necessárias para o projeto.
-      - name: Install dependencies
-        # Instala as dependências do requirements.txt.
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      # Compacta os arquivos da aplicação para o deploy.
-      - name: Zip artifact for deployment
-        # Cria o arquivo release.zip com os arquivos do projeto.
-        run: zip release.zip ./* -r
-
-      # Envia o arquivo compactado como artefato do workflow.
-      - name: Upload artifact for deployment jobs
-        # Utiliza a ação responsável pelo upload de artefatos.
-        uses: actions/upload-artifact@v4
-        # Define as configurações do artefato.
+      - name: Construir e publicar a imagem
+        uses: docker/build-push-action@v7
         with:
-          name: python-app # Nome do artefato.
-          # Define os arquivos enviados e as exclusões.
-          path: |
-            release.zip
-            !venv/
-
-  # Job responsável pela publicação da aplicação no Azure.
-  deploy:
-    # Executa o job em uma máquina virtual Ubuntu.
-    runs-on: ubuntu-latest
-    # Aguarda a conclusão do job build.
-    needs: build
-    # Define o ambiente de implantação.
-    environment:
-      name: 'Production' # Ambiente de produção.
-      # Obtém a URL da aplicação após o deploy.
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    # Define as permissões necessárias para o deploy.
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    # Define as etapas do processo de deploy.
-    steps:
-      # Baixa o artefato gerado pelo job build.
-      - name: Download artifact from build job
-        # Utiliza a ação para baixar os artefatos.
-        uses: actions/download-artifact@v4
-        # Define qual artefato será baixado.
-        with:
-          name: python-app # Nome do artefato gerado.
-
-      # Descompacta os arquivos necessários para o deploy.
-      - name: Unzip artifact for deployment
-        # Extrai o conteúdo do arquivo release.zip.
-        run: unzip release.zip
-
-      
-      
-      # Realiza a autenticação na plataforma Azure.
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          # Identifica a aplicação registrada no Azure.
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1378352164EA43F7B617EAB39148923A }}
-          # Identifica o diretório de autenticação.
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9EDC1172E13744598632922BC9528186 }}
-          # Identifica a assinatura utilizada no Azure.
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F9582E9962864421B372B80B9A6A7E72 }}
-
-
-      # Publica a aplicação Python no Azure Web App.
-      - name: 'Deploy to Azure Web App'
-        # Utiliza a ação oficial de deploy do Azure.
-        uses: azure/webapps-deploy@v3
-        # Identifica a etapa para recuperar sua URL.
-        id: deploy-to-webapp
-        # Define as configurações da publicação.
-        with:
-            app-name: 'lab06' # Nome da minha aplicação no Azure.
-            slot-name: 'Production' # Ambiente de produção.
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ckenzo/engsoft:latest

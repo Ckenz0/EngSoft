@@ -172,3 +172,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Instruções e arquivos de trabalho locais
+.superpowers/
+superpowers/
+AGENTS.md
+agents.md
